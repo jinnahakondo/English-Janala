@@ -50,12 +50,49 @@ const displayLevelWord = words => {
                 <p class="font-medium ">Meaning /Pronounciation</p>
                 <p class="font-bangla text-2xl font-medium text-gray-700">${word.meaning ? word.meaning : "কোনো অর্থ পাওয়া যায়নি"}/${word.pronunciation ? word.pronunciation : "pronunciation পাওয়া যায়নি"}</p>
                 <div class="flex justify-between items-center">
-                <button  onclick="my_modal_5.showModal()" class="bg-[rgba(26,145,255,0.1)] p-2 rounded-lg hover:bg-[rgba(26,145,255,0.5)]"><i class="fa-solid fa-circle-info bg-[rgba(26,145,255,0.1)]"></i></button>
+                <button  onclick="loadWordDetels(${word.id})" class="bg-[rgba(26,145,255,0.1)] p-2 rounded-lg hover:bg-[rgba(26,145,255,0.5)]"><i class="fa-solid fa-circle-info bg-[rgba(26,145,255,0.1)]"></i></button>
                 <button class="bg-[rgba(26,145,255,0.1)] p-2 rounded-lg hover:bg-[rgba(26,145,255,0.5)]"><i class="fa-solid fa-volume-high "></i></button>
                 </div>
         </div>`
         wordsCon.append(card)
     });
 
+}
+
+const loadWordDetels = async (id) => {
+    const url = `https://openapi.programming-hero.com/api/word/${id}`
+    // console.log(url)
+    const res = await fetch(url);
+    const details = await res.json();
+    displayWordDetails(details.data)
+}
+const displayWordDetails = (wordDetails) => {
+    document.getElementById("word-details_modal").showModal()
+    const wordDetailsCon = document.getElementById("details-con");
+    wordDetailsCon.innerHTML =
+        `
+                        <div class="space-y-7">
+                    <div>
+                        <h2 class="text-2xl font-bold">${wordDetails.word} (<i class="fa-solid fa-microphone-lines"></i>:<span
+                                class="font-bangla">${wordDetails.pronunciation}</span>)</h2>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Meaning</h4>
+                        <p class="font-bangla text-lg"> ${wordDetails.meaning}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Example</h4>
+                        <p class="text-gray-600 text-lg">${wordDetails.sentence}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-medium font-bangla mb-2">সমার্থক শব্দ গুলো</h4>
+                        <div class="space-x-3 space-y-3">
+                        <button class="btn bg-[#EDF7FF]">${wordDetails.synonyms[0]}</button>
+                        <button class="btn bg-[#EDF7FF]">${wordDetails.synonyms[1]}</button>
+                        <button class="btn bg-[#EDF7FF]">${wordDetails.synonyms[2]}</button>
+                        </div>
+                    </div>
+                </div>
+    `;
 }
 loadLessons();
