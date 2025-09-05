@@ -5,3 +5,8 @@
 .font-bangal {
     font-family: "Hind Siliguri", sans-serif;
 }
+
+.active {
+    background: #422AD5;
+    color: #fff;
+}
