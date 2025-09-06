@@ -71,11 +71,11 @@ const displayLevelWord = words => {
 // loading 
 const manageLoading = loading => {
     if (loading === true) {
-        document.getElementById("loading-Con").classList.remove("invisible")
+        document.getElementById("loading-Con").classList.remove("hidden")
         document.getElementById("words-con").classList.add("invisible")
     }
     else {
-        document.getElementById("loading-Con").classList.add("invisible")
+        document.getElementById("loading-Con").classList.add("hidden")
         document.getElementById("words-con").classList.remove("invisible")
     }
 }
