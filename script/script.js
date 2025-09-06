@@ -1,3 +1,8 @@
+const createElementS = synonyms => {
+    const elements = synonyms.map(el => `<button class="btn bg-[#EDF7FF]">${el}</button>`);
+    return elements.join(" ")
+}
+
 const loadLessons = () => {
     fetch("https://openapi.programming-hero.com/api/levels/all")
         .then(res => res.json())
@@ -21,6 +26,7 @@ const loadInUi = (lessons) => {
     }
 }
 const loadLevelWord = id => {
+    manageLoading(true)
     const url = `https://openapi.programming-hero.com/api/level/${id}`
     fetch(url)
         .then(res => res.json())
@@ -41,6 +47,8 @@ const displayLevelWord = words => {
                 <p class=" font-bangla text-gray-600 text-center ">এই Lesson এ এখনো কোন Vocabulary যুক্ত করা হয়নি।</p>
                 <h2 class="text-4xl text-center">নেক্সট Lesson এ যান করুন।</h2>
         </div>`;
+        manageLoading(false)
+        return;
     }
     words.forEach(word => {
         const card = document.createElement("div")
@@ -51,12 +59,25 @@ const displayLevelWord = words => {
                 <p class="font-bangla text-2xl font-medium text-gray-700">${word.meaning ? word.meaning : "কোনো অর্থ পাওয়া যায়নি"}/${word.pronunciation ? word.pronunciation : "pronunciation পাওয়া যায়নি"}</p>
                 <div class="flex justify-between items-center">
                 <button  onclick="loadWordDetels(${word.id})" class="bg-[rgba(26,145,255,0.1)] p-2 rounded-lg hover:bg-[rgba(26,145,255,0.5)]"><i class="fa-solid fa-circle-info bg-[rgba(26,145,255,0.1)]"></i></button>
-                <button class="bg-[rgba(26,145,255,0.1)] p-2 rounded-lg hover:bg-[rgba(26,145,255,0.5)]"><i class="fa-solid fa-volume-high "></i></button>
+                <button onclick="pronounceWord('${word.word}')" class="bg-[rgba(26,145,255,0.1)] p-2 rounded-lg hover:bg-[rgba(26,145,255,0.5)]"><i class="fa-solid fa-volume-high "></i></button>
                 </div>
         </div>`
         wordsCon.append(card)
+        manageLoading(false)
+
     });
 
+}
+// loading 
+const manageLoading = loading => {
+    if (loading === true) {
+        document.getElementById("loading-Con").classList.remove("invisible")
+        document.getElementById("words-con").classList.add("invisible")
+    }
+    else {
+        document.getElementById("loading-Con").classList.add("invisible")
+        document.getElementById("words-con").classList.remove("invisible")
+    }
 }
 
 const loadWordDetels = async (id) => {
@@ -86,13 +107,30 @@ const displayWordDetails = (wordDetails) => {
                     </div>
                     <div>
                         <h4 class="text-xl font-medium font-bangla mb-2">সমার্থক শব্দ গুলো</h4>
-                        <div class="space-x-3 space-y-3">
-                        <button class="btn bg-[#EDF7FF]">${wordDetails.synonyms[0]}</button>
-                        <button class="btn bg-[#EDF7FF]">${wordDetails.synonyms[1]}</button>
-                        <button class="btn bg-[#EDF7FF]">${wordDetails.synonyms[2]}</button>
+                        <div class="space-x-3">${createElementS(wordDetails.synonyms)}
                         </div>
                     </div>
                 </div>
     `;
 }
 loadLessons();
+// search
+document.getElementById("search-btn").addEventListener("click", () => {
+    removeActive()
+    const searchValue = document.getElementById("search-input").value.trim().toLowerCase();
+    fetch("https://openapi.programming-hero.com/api/words/all")
+        .then(res => res.json())
+        .then(data => {
+            const words = data.data;
+            const filterWords = words.filter(word => word.word.toLowerCase().includes(searchValue))
+            displayLevelWord(filterWords)
+        })
+
+})
+
+// speak words 
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-EN"; // English
+  window.speechSynthesis.speak(utterance);
+}
